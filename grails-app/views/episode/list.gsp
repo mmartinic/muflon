@@ -1,6 +1,6 @@
 
 <%@page import="org.joda.time.LocalDate"%>
-<%@ page import="org.mmartinic.muflon.Episode" %>
+<%@ page import="org.mmartinic.muflon.util.CssUtil" %>
 <!doctype html>
 <html>
 	<head>
@@ -41,35 +41,12 @@
 				<%
 				LocalDate previousDate
 				String cssClass
-				String cssTime
-				LocalDate today = new LocalDate()
 				%>
 				<g:each in="${episodeInstanceList}" var="episodeInstance">
 					<%
-					if (previousDate != episodeInstance.airDate) {
-						if (previousDate != null) {
-							if (cssClass == "odd") {
-								cssClass = "even"
-							}
-							else {
-								cssClass = "odd"
-							}
-						}
-						else {
-							cssClass = "odd"
-						}
-				
-						if (episodeInstance.airDate > today) {
-							cssTime = "Future"
-						}
-						else if (episodeInstance.airDate < today) {
-							cssTime = "Past"
-						}
-				
-						previousDate = episodeInstance.airDate
-					}
+					(cssClass, previousDate) = CssUtil.getEpisodeRowClass(cssClass, previousDate, episodeInstance)
 					%>
-					<tr class="${episodeInstance.airDate == today ? "today" : cssClass+cssTime}">
+					<tr class="${cssClass}">
 					
 						<td>${fieldValue(bean: episodeInstance.show, field: "name")}</td>
 					
