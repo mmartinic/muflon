@@ -90,4 +90,6 @@ log4j = {
            'org.springframework',
            'org.hibernate',
            'net.sf.ehcache.hibernate'
+	
+	debug 'org.mmartinic.muflon'
 }

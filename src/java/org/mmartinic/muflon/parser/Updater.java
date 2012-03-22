@@ -1,16 +1,12 @@
 package org.mmartinic.muflon.parser;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.text.ParseException;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.http.client.ClientProtocolException;
-import org.mmartinic.muflon.dao.model.EpisodeServiceException;
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mmartinic.muflon.dao.model.IEpisodeService;
 import org.mmartinic.muflon.dao.model.IShowService;
-import org.mmartinic.muflon.dao.model.ShowServiceException;
 import org.mmartinic.muflon.model.Episode;
 import org.mmartinic.muflon.model.Show;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class Updater {
 
+	private static final Log log = LogFactory.getLog(Updater.class);
+	
 	@Autowired
 	private IEpisodeService episodeService;
 	@Autowired
@@ -34,14 +32,21 @@ public class Updater {
 	 */
 	@SuppressWarnings("unchecked")
 	public void partialUpdate() {
+		log.debug("Starting partialUpdate");
 		MyEpisodesHTTPClient myEpisodesHTTPClient = new MyEpisodesHTTPClient();
 		try {
 			List<Show> currentShows = myEpisodesHTTPClient.getAllShows();
 			List<Show> dbShows = showService.getAllShows();
 
-			List<Show> newShows = (List<Show>) CollectionUtils.removeAll(currentShows, dbShows);
-			List<Show> removedShows = (List<Show>) CollectionUtils.removeAll(dbShows, currentShows);
+			List<Show> newShows = (List<Show>) ListUtils.removeAll(currentShows, dbShows);
+			List<Show> removedShows = (List<Show>) ListUtils.removeAll(dbShows, currentShows);
 
+			log.debug("partialUpdate - currentShows: count(" + currentShows.size() + ") :" + currentShows);
+			log.debug("partialUpdate - dbShows: count(" + dbShows.size() + ") :" + dbShows);
+			log.debug("partialUpdate - newShows: count(" + newShows.size() + ") :" + newShows);
+			log.debug("partialUpdate - removedShows: count(" + removedShows.size() + ") :" + removedShows);
+			
+			log.debug("Starting partialUpdate - remove shows");
 			for (Show show : removedShows) {
 				// TODO set on delete cascade to delete all episodes for show
 				List<Episode> episodes = episodeService.getAllEpisodesForShow(show.getId());
@@ -50,6 +55,7 @@ public class Updater {
 				}
 				showService.deleteShow(show.getId());
 			}
+			log.debug("Starting partialUpdate - add new shows");
 			for (Show show : newShows) {
 				Long showId = showService.addShow(show);
 				List<Episode> episodesForShow = myEpisodesHTTPClient.getAllEpisodesForShow(showId);
@@ -60,10 +66,10 @@ public class Updater {
 				try {
 					Thread.sleep(5000);
 				} catch (InterruptedException e) {
-					System.out.println("ERROR: " + e.getMessage());
 				}
 			}
 
+			log.debug("Starting partialUpdate - rss update");
 			RSSParser rssParser = new RSSParser();
 			List<Episode> episodesFromRSSFeed = rssParser.getEpisodesFromRSSFeed();
 			for (Episode episode : episodesFromRSSFeed) {
@@ -81,20 +87,13 @@ public class Updater {
 					episodeService.addEpisode(episode);
 				}
 			}
-		} catch (EpisodeServiceException e) {
-			System.out.println("ERROR: " + e.getMessage());
-		} catch (ShowServiceException e) {
-			System.out.println("ERROR: " + e.getMessage());
-		} catch (ClientProtocolException e) {
-			System.out.println("ERROR: " + e.getMessage());
-		} catch (IOException e) {
-			System.out.println("ERROR: " + e.getMessage());
-		} catch (ParseException e) {
-			System.out.println("ERROR: " + e.getMessage());
+		} catch (Exception e) {
+			log.error(e, e);
 		} finally {
 			// TODO check this
 			myEpisodesHTTPClient.shutdown();
 		}
+		log.debug("Exiting partialUpdate");
 	}
 
 	/**
@@ -103,6 +102,7 @@ public class Updater {
 	 * Current show list is retrieved from MyEpisodes and all shows and its episodes are added to DB
 	 */
 	public void completeUpdate() {
+		log.debug("Starting completeUpdate");
 		MyEpisodesHTTPClient myEpisodesHTTPClient = new MyEpisodesHTTPClient();
 		try {
 			List<Show> dbShows = showService.getAllShows();
@@ -126,26 +126,19 @@ public class Updater {
 				try {
 					Thread.sleep(5000);
 				} catch (InterruptedException e) {
-					System.out.println("ERROR: " + e.getMessage());
 				}
 			}
-		} catch (ClientProtocolException e) {
-			System.out.println("ERROR: " + e.getMessage());
-		} catch (IOException e) {
-			System.out.println("ERROR: " + e.getMessage());
-		} catch (ShowServiceException e) {
-			System.out.println("ERROR: " + e.getMessage());
-		} catch (ParseException e) {
-			System.out.println("ERROR: " + e.getMessage());
-		} catch (EpisodeServiceException e) {
-			System.out.println("ERROR: " + e.getMessage());
+		} catch (Exception e) {
+			log.error(e, e);
 		} finally {
 			// TODO check this
 			myEpisodesHTTPClient.shutdown();
 		}
+		log.debug("Exiting completeUpdate");
 	}
 
 	public void addOnlyFromRSSFeed() {
+		log.debug("Starting addOnlyFromRSSFeed");
 		try {
 			RSSParser rssParser = new RSSParser();
 			List<Episode> episodesFromRSSFeed = rssParser.getEpisodesFromRSSFeed();
@@ -168,26 +161,9 @@ public class Updater {
 					episodeService.addEpisode(episode);
 				}
 			}
-		} catch (EpisodeServiceException e) {
-			System.out.println("ERROR: " + e.getMessage());
-		} catch (ShowServiceException e) {
-			System.out.println("ERROR: " + e.getMessage());
+		} catch (Exception e) {
+			log.error(e, e);
 		}
-	}
-
-	public void listAllFromDb() {
-		try {
-			List<Show> shows = showService.getAllShows();
-			for (Show show : shows) {
-				List<Episode> episodes = episodeService.getAllEpisodesForShow(show.getId());
-				for (Episode episode : episodes) {
-					System.out.println(episode.toString());
-				}
-			}
-		} catch (ShowServiceException e) {
-			System.out.println("ERROR: " + e.getMessage());
-		} catch (EpisodeServiceException e) {
-			System.out.println("ERROR: " + e.getMessage());
-		}
+		log.debug("Exiting addOnlyFromRSSFeed");
 	}
 }
