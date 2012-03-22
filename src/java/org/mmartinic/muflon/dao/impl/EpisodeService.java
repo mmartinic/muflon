@@ -38,7 +38,7 @@ public class EpisodeService extends AbstractDaoService<Episode, EpisodeKey> impl
 	public List<Episode> getAllEpisodesForShow(Long showId) throws EpisodeServiceException {
 		try {
 			Criteria criteria = getSession().createCriteria(Episode.class);
-			criteria.add(Restrictions.eq("episodeKey.show.showId", showId));
+			criteria.add(Restrictions.eq("episodeKey.show.id", showId));
 			return findByCriteria(criteria);
 		} catch (Exception e) {
 			throw new EpisodeServiceException(e);
@@ -49,7 +49,7 @@ public class EpisodeService extends AbstractDaoService<Episode, EpisodeKey> impl
 	public Long getEpisodesForShowCount(Long showId) throws EpisodeServiceException {
 		try {
 			Criteria criteria = getSession().createCriteria(Episode.class);
-			criteria.add(Restrictions.eq("episodeKey.show.showId", showId));
+			criteria.add(Restrictions.eq("episodeKey.show.id", showId));
 			return getCountByCriteria(criteria);
 		} catch (Exception e) {
 			throw new EpisodeServiceException(e);

@@ -96,23 +96,27 @@ public class MyEpisodesHTTPClient implements Serializable {
 		Matcher m = p.matcher(responseBody);
 		DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd-MMM-yyyy");
 		while (m.find()) {
-			String airDate = StringUtils.trim(m.group(1));
-			String showName = StringUtils.trim(m.group(2));
-			String seasonAndEpisode = StringUtils.trim(m.group(3));
-			Integer season = Integer.parseInt(seasonAndEpisode.split("x")[0]);
-			Integer episodeNumber = Integer.parseInt(seasonAndEpisode.split("x")[1]);
-			String episodeName = StringUtils.trim(m.group(4));
-
-			Show show = new Show();
-			show.setId(showId);
-			show.setName(showName);
-			Episode episode = new Episode();
-			episode.getEpisodeKey().setShow(show);
-			episode.getEpisodeKey().setSeasonNumber(season);
-			episode.getEpisodeKey().setEpisodeNumber(episodeNumber);
-			episode.setAirDate(dateTimeFormatter.parseLocalDate(airDate));
-			episode.setName(episodeName);
-			episodes.add(episode);
+			try {
+				String airDate = StringUtils.trim(m.group(1));
+				String showName = StringUtils.trim(m.group(2));
+				String seasonAndEpisode = StringUtils.trim(m.group(3));
+				Integer season = Integer
+						.parseInt(seasonAndEpisode.split("x")[0]);
+				Integer episodeNumber = Integer.parseInt(seasonAndEpisode
+						.split("x")[1]);
+				String episodeName = StringUtils.trim(m.group(4));
+				Show show = new Show();
+				show.setId(showId);
+				show.setName(showName);
+				Episode episode = new Episode();
+				episode.getEpisodeKey().setShow(show);
+				episode.getEpisodeKey().setSeasonNumber(season);
+				episode.getEpisodeKey().setEpisodeNumber(episodeNumber);
+				episode.setAirDate(dateTimeFormatter.parseLocalDate(airDate));
+				episode.setName(episodeName);
+				episodes.add(episode);
+			} catch (Exception e) {
+			}
 		}
 		return episodes;
 	}

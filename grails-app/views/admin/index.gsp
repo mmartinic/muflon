@@ -17,7 +17,9 @@
 			<g:if test="${flash.message}">
 				<div class="message" role="status">${flash.message}</div>
 			</g:if>
-			<g:link class="create" action="refresh"><input type="button" value="${message(code: 'admin.refresh.label', default: 'Refresh')}"/></g:link>
+			<g:link class="create" action="rssUpdate"><input type="button" value="${message(code: 'admin.rss.update.label', default: 'RSS update')}"/></g:link>
+			<g:link class="create" action="partialUpdate"><input type="button" value="${message(code: 'admin.partial.update.label', default: 'Partial update')}"/></g:link>
+			<g:link class="create" action="completeUpdate"><input type="button" value="${message(code: 'admin.complete.update.label', default: 'Complete update')}"/></g:link>
 		</div>
 	</body>
 </html>

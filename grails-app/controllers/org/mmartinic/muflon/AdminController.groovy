@@ -9,10 +9,18 @@ class AdminController {
 	
     def index() { }
 	
-    def refresh() {
-//		RSSParser rssParser = new RSSParser()
-//		println rssParser.getEpisodesFromRSSFeed()
+    def rssUpdate() {
 		updater.addOnlyFromRSSFeed()
 		redirect(action: "index", params: params)
 	}
+	
+    def partialUpdate() {
+    	updater.partialUpdate()
+    	redirect(action: "index", params: params)
+    }
+	
+    def completeUpdate() {
+    	updater.completeUpdate()
+    	redirect(action: "index", params: params)
+    }
 }

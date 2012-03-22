@@ -25,8 +25,6 @@ public class Updater {
 	private IEpisodeService episodeService;
 	@Autowired
 	private IShowService showService;
-	// TODO refactor - autowired
-	private MyEpisodesHTTPClient myEpisodesHTTPClient = new MyEpisodesHTTPClient();
 
 	/**
 	 * Partial update, executes the following actions:<br>
@@ -36,6 +34,7 @@ public class Updater {
 	 */
 	@SuppressWarnings("unchecked")
 	public void partialUpdate() {
+		MyEpisodesHTTPClient myEpisodesHTTPClient = new MyEpisodesHTTPClient();
 		try {
 			List<Show> currentShows = myEpisodesHTTPClient.getAllShows();
 			List<Show> dbShows = showService.getAllShows();
@@ -104,6 +103,7 @@ public class Updater {
 	 * Current show list is retrieved from MyEpisodes and all shows and its episodes are added to DB
 	 */
 	public void completeUpdate() {
+		MyEpisodesHTTPClient myEpisodesHTTPClient = new MyEpisodesHTTPClient();
 		try {
 			List<Show> dbShows = showService.getAllShows();
 			for (Show show : dbShows) {
