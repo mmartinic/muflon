@@ -1,8 +1,6 @@
 package org.mmartinic.muflon.parser;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -11,6 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.mmartinic.muflon.model.Episode;
@@ -18,13 +18,14 @@ import org.mmartinic.muflon.model.Show;
 
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
 public class RSSParser implements Serializable {
 
 	private static final long serialVersionUID = 3823571360336453906L;
+	
+	private static final Log log = LogFactory.getLog(RSSParser.class);
 
 	private static final String MY_EPISODES_RSS_LINK = "";
 	
@@ -45,16 +46,8 @@ public class RSSParser implements Serializable {
 			for (Object object : feed.getEntries()) {
 				episodes.add(parseEntry((SyndEntryImpl) object));
 			}
-		} catch (MalformedURLException e) {
-			System.out.println("ERROR: " + e.getMessage());
-		} catch (IllegalArgumentException e) {
-			System.out.println("ERROR: " + e.getMessage());
-		} catch (FeedException e) {
-			System.out.println("ERROR: " + e.getMessage());
-		} catch (IOException e) {
-			System.out.println("ERROR: " + e.getMessage());
-		} catch (ParseException e) {
-			System.out.println("ERROR: " + e.getMessage());
+		} catch (Exception e) {
+			log.error(e, e);
 		}
 		return episodes;
 	}

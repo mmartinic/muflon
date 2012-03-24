@@ -9,6 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -31,6 +33,8 @@ public class MyEpisodesHTTPClient implements Serializable {
 
 	private static final long serialVersionUID = -6884602411077537947L;
 
+	private static final Log log = LogFactory.getLog(MyEpisodesHTTPClient.class);
+	
 	private static final String MY_EPISODES_COOKIE = "";
 	private static final String MY_EPISODES_URL = "http://www.myepisodes.com/";
 	private static final String LOGIN_LOCATION = "login.php";
@@ -53,7 +57,7 @@ public class MyEpisodesHTTPClient implements Serializable {
 	public List<Show> getAllShows() throws ClientProtocolException, IOException {
 		HttpGet httpGet = new HttpGet(MY_EPISODES_URL + MANAGE_SHOWS_LOCATION);
 		httpGet.setHeader("Cookie", MY_EPISODES_COOKIE);
-		System.out.println("Executing request: " + httpGet.getURI());
+		log.debug("Executing request: " + httpGet.getURI());
 		HttpResponse httpResponse = httpClient.execute(httpGet);
 		String responseBody = getResponseAsString(httpResponse);
 		httpGet.abort();
@@ -83,7 +87,7 @@ public class MyEpisodesHTTPClient implements Serializable {
 	public List<Episode> getAllEpisodesForShow(Long showId) throws ClientProtocolException, IOException, ParseException {
 		HttpGet httpGet = new HttpGet(MY_EPISODES_URL + EPISODES_BY_SHOW_LOCATION + showId.toString());
 		httpGet.setHeader("Cookie", MY_EPISODES_COOKIE);
-		System.out.println("Executing request: " + httpGet.getURI());
+		log.debug("Executing request: " + httpGet.getURI());
 		HttpResponse httpResponse = httpClient.execute(httpGet);
 		String responseBody = getResponseAsString(httpResponse);
 		httpGet.abort();
@@ -142,7 +146,7 @@ public class MyEpisodesHTTPClient implements Serializable {
 		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formParams, "UTF-8");
 		HttpPost httpPost = new HttpPost(MY_EPISODES_URL + LOGIN_LOCATION);
 		httpPost.setEntity(entity);
-		System.out.println("Executing request: " + httpPost.getURI());
+		log.debug("Executing request: " + httpPost.getURI());
 		HttpResponse httpResponse = httpClient.execute(httpPost, localContext);
 		httpPost.abort();
 
