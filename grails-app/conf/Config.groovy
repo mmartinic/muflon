@@ -93,3 +93,8 @@ log4j = {
 	
 	debug 'org.mmartinic.muflon'
 }
+
+// Added by the Spring Security Core plugin:
+grails.plugins.springsecurity.userLookup.userDomainClassName = 'org.mmartinic.muflon.User'
+grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'org.mmartinic.muflon.UserRole'
+grails.plugins.springsecurity.authority.className = 'org.mmartinic.muflon.Role'

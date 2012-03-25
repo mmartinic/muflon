@@ -1,8 +1,10 @@
 package org.mmartinic.muflon
 
-import org.mmartinic.muflon.parser.RSSParser;
+import grails.plugins.springsecurity.Secured
+
 import org.mmartinic.muflon.parser.Updater
 
+@Secured(['ROLE_ADMIN'])
 class AdminController {
 
 	Updater updater
