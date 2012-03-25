@@ -1,9 +1,12 @@
 package org.mmartinic.muflon
 
-import org.joda.time.LocalDate
-import org.mmartinic.muflon.model.Episode
-import org.springframework.dao.DataIntegrityViolationException
+import grails.plugins.springsecurity.Secured
 
+import org.joda.time.LocalDate
+
+import org.mmartinic.muflon.model.Episode
+
+@Secured([Role.USER, Role.ADMIN])
 class EpisodeController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]

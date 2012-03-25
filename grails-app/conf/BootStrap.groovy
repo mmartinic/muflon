@@ -21,8 +21,8 @@ class BootStrap {
 		
 		switch(GrailsUtil.environment) {
 			case "development":
-			def adminRole = new Role(authority: 'ROLE_ADMIN').save(flush: true)
-			def userRole = new Role(authority: 'ROLE_USER').save(flush: true)
+			def adminRole = new Role(authority: Role.ADMIN).save(flush: true)
+			def userRole = new Role(authority: Role.USER).save(flush: true)
 			
 			def testUser = new User(username: 'me', enabled: true, password: 'password')
 			testUser.save(flush: true)
