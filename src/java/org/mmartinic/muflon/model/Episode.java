@@ -22,208 +22,208 @@ import org.joda.time.LocalDate;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Episode implements Serializable {
 
-	private static final long serialVersionUID = -1000975580285590848L;
+    private static final long serialVersionUID = -1000975580285590848L;
 
-	private EpisodeKey episodeKey = new EpisodeKey();
-	private String name;
-	private LocalDate airDate;
+    private EpisodeKey episodeKey = new EpisodeKey();
+    private String name;
+    private LocalDate airDate;
 
-	public Episode() {
-		super();
-	}
+    public Episode() {
+        super();
+    }
 
-	public Episode(EpisodeKey episodeKey, String name, LocalDate airDate) {
-		super();
-		this.episodeKey = episodeKey;
-		this.name = name;
-		this.airDate = airDate;
-	}
+    public Episode(EpisodeKey episodeKey, String name, LocalDate airDate) {
+        super();
+        this.episodeKey = episodeKey;
+        this.name = name;
+        this.airDate = airDate;
+    }
 
-	@EmbeddedId
-	public EpisodeKey getEpisodeKey() {
-		return episodeKey;
-	}
+    @EmbeddedId
+    public EpisodeKey getEpisodeKey() {
+        return episodeKey;
+    }
 
-	public void setEpisodeKey(EpisodeKey episodeKey) {
-		this.episodeKey = episodeKey;
-	}
+    public void setEpisodeKey(EpisodeKey episodeKey) {
+        this.episodeKey = episodeKey;
+    }
 
-	@Column(name = "name", length = 255, nullable = false)
-	public String getName() {
-		return name;
-	}
+    @Column(name = "name", length = 255, nullable = false)
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	@Column(name = "air_date", nullable = false)
-	public LocalDate getAirDate() {
-		return airDate;
-	}
+    @Column(name = "air_date", nullable = false)
+    public LocalDate getAirDate() {
+        return airDate;
+    }
 
-	public void setAirDate(LocalDate airDate) {
-		this.airDate = airDate;
-	}
-	
-	@Transient
-	public Show getShow() {
-		return episodeKey.getShow();
-	}
+    public void setAirDate(LocalDate airDate) {
+        this.airDate = airDate;
+    }
 
-	public void setShow(Show show) {
-		episodeKey.setShow(show);
-	}
+    @Transient
+    public Show getShow() {
+        return episodeKey.getShow();
+    }
 
-	@Transient
-	public Integer getSeasonNumber() {
-		return episodeKey.getSeasonNumber();
-	}
+    public void setShow(Show show) {
+        episodeKey.setShow(show);
+    }
 
-	public void setSeasonNumber(Integer seasonNumber) {
-		episodeKey.setSeasonNumber(seasonNumber);
-	}
+    @Transient
+    public Integer getSeasonNumber() {
+        return episodeKey.getSeasonNumber();
+    }
 
-	@Transient
-	public Integer getEpisodeNumber() {
-		return episodeKey.getEpisodeNumber();
-	}
+    public void setSeasonNumber(Integer seasonNumber) {
+        episodeKey.setSeasonNumber(seasonNumber);
+    }
 
-	public void setEpisodeNumber(Integer episodeNumber) {
-		episodeKey.setEpisodeNumber(episodeNumber);
-	}
+    @Transient
+    public Integer getEpisodeNumber() {
+        return episodeKey.getEpisodeNumber();
+    }
 
-	@Embeddable
-	public static class EpisodeKey implements Serializable {
+    public void setEpisodeNumber(Integer episodeNumber) {
+        episodeKey.setEpisodeNumber(episodeNumber);
+    }
 
-		private static final long serialVersionUID = -599289068633445871L;
+    @Embeddable
+    public static class EpisodeKey implements Serializable {
 
-		private Show show;
-		private Integer seasonNumber;
-		private Integer episodeNumber;
+        private static final long serialVersionUID = -599289068633445871L;
 
-		public EpisodeKey() {
-			super();
-		}
+        private Show show;
+        private Integer seasonNumber;
+        private Integer episodeNumber;
 
-		public EpisodeKey(Show show, Integer seasonNumber, Integer episodeNumber) {
-			super();
-			this.show = show;
-			this.seasonNumber = seasonNumber;
-			this.episodeNumber = episodeNumber;
-		}
+        public EpisodeKey() {
+            super();
+        }
 
-		@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.EAGER)
-		@JoinColumn(name = "show_id", referencedColumnName = "id", nullable = false)
-		public Show getShow() {
-			return show;
-		}
+        public EpisodeKey(Show show, Integer seasonNumber, Integer episodeNumber) {
+            super();
+            this.show = show;
+            this.seasonNumber = seasonNumber;
+            this.episodeNumber = episodeNumber;
+        }
 
-		public void setShow(Show show) {
-			this.show = show;
-		}
+        @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.EAGER)
+        @JoinColumn(name = "show_id", referencedColumnName = "id", nullable = false)
+        public Show getShow() {
+            return show;
+        }
 
-		@Column(name = "season_number", nullable = false)
-		public Integer getSeasonNumber() {
-			return seasonNumber;
-		}
+        public void setShow(Show show) {
+            this.show = show;
+        }
 
-		public void setSeasonNumber(Integer seasonNumber) {
-			this.seasonNumber = seasonNumber;
-		}
+        @Column(name = "season_number", nullable = false)
+        public Integer getSeasonNumber() {
+            return seasonNumber;
+        }
 
-		@Column(name = "episode_number", nullable = false)
-		public Integer getEpisodeNumber() {
-			return episodeNumber;
-		}
+        public void setSeasonNumber(Integer seasonNumber) {
+            this.seasonNumber = seasonNumber;
+        }
 
-		public void setEpisodeNumber(Integer episodeNumber) {
-			this.episodeNumber = episodeNumber;
-		}
+        @Column(name = "episode_number", nullable = false)
+        public Integer getEpisodeNumber() {
+            return episodeNumber;
+        }
 
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((episodeNumber == null) ? 0 : episodeNumber.hashCode());
-			result = prime * result + ((seasonNumber == null) ? 0 : seasonNumber.hashCode());
-			result = prime * result + ((show == null) ? 0 : show.hashCode());
-			return result;
-		}
+        public void setEpisodeNumber(Integer episodeNumber) {
+            this.episodeNumber = episodeNumber;
+        }
 
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			EpisodeKey other = (EpisodeKey) obj;
-			if (episodeNumber == null) {
-				if (other.episodeNumber != null)
-					return false;
-			} else if (!episodeNumber.equals(other.episodeNumber))
-				return false;
-			if (seasonNumber == null) {
-				if (other.seasonNumber != null)
-					return false;
-			} else if (!seasonNumber.equals(other.seasonNumber))
-				return false;
-			if (show == null) {
-				if (other.show != null)
-					return false;
-			} else if (!show.equals(other.show))
-				return false;
-			return true;
-		}
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((episodeNumber == null) ? 0 : episodeNumber.hashCode());
+            result = prime * result + ((seasonNumber == null) ? 0 : seasonNumber.hashCode());
+            result = prime * result + ((show == null) ? 0 : show.hashCode());
+            return result;
+        }
 
-		@Override
-		public String toString() {
-			return "EpisodeKey [show=" + show + ", seasonNumber=" + seasonNumber + ", episodeNumber=" + episodeNumber + "]";
-		}
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            EpisodeKey other = (EpisodeKey) obj;
+            if (episodeNumber == null) {
+                if (other.episodeNumber != null)
+                    return false;
+            } else if (!episodeNumber.equals(other.episodeNumber))
+                return false;
+            if (seasonNumber == null) {
+                if (other.seasonNumber != null)
+                    return false;
+            } else if (!seasonNumber.equals(other.seasonNumber))
+                return false;
+            if (show == null) {
+                if (other.show != null)
+                    return false;
+            } else if (!show.equals(other.show))
+                return false;
+            return true;
+        }
 
-	}
+        @Override
+        public String toString() {
+            return "EpisodeKey [show=" + show + ", seasonNumber=" + seasonNumber + ", episodeNumber=" + episodeNumber + "]";
+        }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((airDate == null) ? 0 : airDate.hashCode());
-		result = prime * result + ((episodeKey == null) ? 0 : episodeKey.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
-	}
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Episode other = (Episode) obj;
-		if (airDate == null) {
-			if (other.airDate != null)
-				return false;
-		} else if (!airDate.equals(other.airDate))
-			return false;
-		if (episodeKey == null) {
-			if (other.episodeKey != null)
-				return false;
-		} else if (!episodeKey.equals(other.episodeKey))
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		return true;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((airDate == null) ? 0 : airDate.hashCode());
+        result = prime * result + ((episodeKey == null) ? 0 : episodeKey.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        return result;
+    }
 
-	@Override
-	public String toString() {
-		return "Episode [episodeKey=" + episodeKey + ", name=" + name + ", airDate=" + airDate + "]";
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Episode other = (Episode) obj;
+        if (airDate == null) {
+            if (other.airDate != null)
+                return false;
+        } else if (!airDate.equals(other.airDate))
+            return false;
+        if (episodeKey == null) {
+            if (other.episodeKey != null)
+                return false;
+        } else if (!episodeKey.equals(other.episodeKey))
+            return false;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Episode [episodeKey=" + episodeKey + ", name=" + name + ", airDate=" + airDate + "]";
+    }
 }

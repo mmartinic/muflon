@@ -12,19 +12,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AbstractTransactionalService {
 
-	@Autowired
-	private SessionFactory sessionFactory;
+    @Autowired
+    private SessionFactory sessionFactory;
 
-	protected Session getSession() {
-		return sessionFactory.getCurrentSession();
-	}
+    protected Session getSession() {
+        return sessionFactory.getCurrentSession();
+    }
 
-	@SuppressWarnings("unchecked")
-	protected <T> T safelyLoadObject(Class<T> clazz, Serializable primaryKey) {
-		if (primaryKey == null) {
-			return null;
-		}
-		return (T) getSession().load(clazz, primaryKey);
-	}
+    @SuppressWarnings("unchecked")
+    protected <T> T safelyLoadObject(Class<T> clazz, Serializable primaryKey) {
+        if (primaryKey == null) {
+            return null;
+        }
+        return (T) getSession().load(clazz, primaryKey);
+    }
 
 }
