@@ -23,63 +23,71 @@ import com.sun.syndication.io.XmlReader;
 
 public class RSSParser implements Serializable {
 
-	private static final long serialVersionUID = 3823571360336453906L;
-	
-	private static final Log log = LogFactory.getLog(RSSParser.class);
+    private static final long serialVersionUID = 3823571360336453906L;
 
-	private static final String MY_EPISODES_RSS_LINK = "";
-	
-	private DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd-MMM-yyyy");
+    private static final Log log = LogFactory.getLog(RSSParser.class);
 
-	/**
-	 * Retrieves and parses all episodes from RSS feed
-	 * 
-	 * @return all episodes from RSS feed
-	 */
-	public List<Episode> getEpisodesFromRSSFeed() {
-		List<Episode> episodes = new ArrayList<Episode>();
-		try {
-			URL feedUrl = new URL(MY_EPISODES_RSS_LINK);
-			SyndFeedInput input = new SyndFeedInput();
-			SyndFeed feed = input.build(new XmlReader(feedUrl));
+    private static final String MY_EPISODES_RSS_LINK = "http://www.myepisodes.com/rss.php?feed=mylist&uid=%s&pwdmd5=%s";
 
-			for (Object object : feed.getEntries()) {
-				episodes.add(parseEntry((SyndEntryImpl) object));
-			}
-		} catch (Exception e) {
-			log.error(e, e);
-		}
-		return episodes;
-	}
+    private DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd-MMM-yyyy");
 
-	/**
-	 * Parses one RSS feed entry
-	 * 
-	 * @param syndEntryImpl
-	 *            entry
-	 * @return episode object parsed from entry
-	 * @throws ParseException
-	 */
-	private Episode parseEntry(SyndEntryImpl syndEntryImpl) throws ParseException {
-		Episode episode = new Episode();
+    private final String myEpisodesUsername;
+    private final String pwdmd5;
 
-		String uri = syndEntryImpl.getUri();
-		String[] items = uri.split("-");
+    public RSSParser(String myEpisodesUsername, String pwdmd5) {
+        this.myEpisodesUsername = myEpisodesUsername;
+        this.pwdmd5 = pwdmd5;
+    }
 
-		String title = syndEntryImpl.getTitle();
-		Pattern p = Pattern.compile("\\[(.+?)\\]\\[(.+?)\\]\\[(.+?)\\]\\[(.+?)\\]");
-		Matcher m = p.matcher(title);
-		m.find();
-		
-		Show show = new Show();
-		show.setId(Long.parseLong(items[0]));
-		show.setName(StringUtils.trim(m.group(1)));
-		episode.getEpisodeKey().setShow(show);
-		episode.getEpisodeKey().setSeasonNumber(Integer.parseInt(items[1]));
-		episode.getEpisodeKey().setEpisodeNumber(Integer.parseInt(items[2]));
-		episode.setName(StringUtils.trim(m.group(3)));
-		episode.setAirDate(dateTimeFormatter.parseLocalDate(StringUtils.trim(m.group(4))));
+    /**
+     * Retrieves and parses all episodes from RSS feed
+     * 
+     * @return all episodes from RSS feed
+     */
+    public List<Episode> getEpisodesFromRSSFeed() {
+        List<Episode> episodes = new ArrayList<Episode>();
+        try {
+            URL feedUrl = new URL(String.format(MY_EPISODES_RSS_LINK, myEpisodesUsername, pwdmd5));
+            SyndFeedInput input = new SyndFeedInput();
+            SyndFeed feed = input.build(new XmlReader(feedUrl));
 
-		return episode;
-	}
+            for (Object object : feed.getEntries()) {
+                episodes.add(parseEntry((SyndEntryImpl) object));
+            }
+        } catch (Exception e) {
+            log.error(e, e);
+        }
+        return episodes;
+    }
+
+    /**
+     * Parses one RSS feed entry
+     * 
+     * @param syndEntryImpl
+     *            entry
+     * @return episode object parsed from entry
+     * @throws ParseException
+     */
+    private Episode parseEntry(SyndEntryImpl syndEntryImpl) throws ParseException {
+        Episode episode = new Episode();
+
+        String uri = syndEntryImpl.getUri();
+        String[] items = uri.split("-");
+
+        String title = syndEntryImpl.getTitle();
+        Pattern p = Pattern.compile("\\[(.+?)\\]\\[(.+?)\\]\\[(.+?)\\]\\[(.+?)\\]");
+        Matcher m = p.matcher(title);
+        m.find();
+
+        Show show = new Show();
+        show.setId(Long.parseLong(items[0]));
+        show.setName(StringUtils.trim(m.group(1)));
+        episode.getEpisodeKey().setShow(show);
+        episode.getEpisodeKey().setSeasonNumber(Integer.parseInt(items[1]));
+        episode.getEpisodeKey().setEpisodeNumber(Integer.parseInt(items[2]));
+        episode.setName(StringUtils.trim(m.group(3)));
+        episode.setAirDate(dateTimeFormatter.parseLocalDate(StringUtils.trim(m.group(4))));
+
+        return episode;
+    }
 }

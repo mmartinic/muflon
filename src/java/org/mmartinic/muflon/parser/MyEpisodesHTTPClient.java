@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,142 +33,153 @@ import org.mmartinic.muflon.model.Show;
 
 public class MyEpisodesHTTPClient implements Serializable {
 
-	private static final long serialVersionUID = -6884602411077537947L;
+    private static final long serialVersionUID = -6884602411077537947L;
 
-	private static final Log log = LogFactory.getLog(MyEpisodesHTTPClient.class);
-	
-	private static final String MY_EPISODES_COOKIE = "";
-	private static final String MY_EPISODES_URL = "http://www.myepisodes.com/";
-	private static final String LOGIN_LOCATION = "login.php";
-	private static final String MANAGE_SHOWS_LOCATION = "shows.php?type=manage";
-	private static final String EPISODES_BY_SHOW_LOCATION = "views.php?type=epsbyshow&showid=";
+    private static final Log log = LogFactory.getLog(MyEpisodesHTTPClient.class);
 
-	private final DefaultHttpClient httpClient;
+    private static final String MY_EPISODES_URL = "http://www.myepisodes.com/";
+    private static final String LOGIN_LOCATION = "login.php";
+    private static final String MANAGE_SHOWS_LOCATION = "shows.php?type=manage";
+    private static final String EPISODES_BY_SHOW_LOCATION = "views.php?type=epsbyshow&showid=";
 
-	public MyEpisodesHTTPClient() {
-		httpClient = new DefaultHttpClient();
-	}
+    public static final String COOKIE_NAME = "Set-Cookie";
+    public static final String PHPSESSLVID = "PHPSESSLVID";
+    public static final String PHPSESSID = "PHPSESSID";
+    public static final String PHPSESSUID = "PHPSESSUID";
+    public static final String PHPSESSGID = "PHPSESSGID";
 
-	/**
-	 * Returns all my shows
-	 * 
-	 * @return all my shows
-	 * @throws ClientProtocolException
-	 * @throws IOException
-	 */
-	public List<Show> getAllShows() throws ClientProtocolException, IOException {
-		HttpGet httpGet = new HttpGet(MY_EPISODES_URL + MANAGE_SHOWS_LOCATION);
-		httpGet.setHeader("Cookie", MY_EPISODES_COOKIE);
-		log.debug("Executing request: " + httpGet.getURI());
-		HttpResponse httpResponse = httpClient.execute(httpGet);
-		String responseBody = getResponseAsString(httpResponse);
-		httpGet.abort();
+    private final DefaultHttpClient httpClient;
 
-		List<Show> shows = new ArrayList<Show>();
-		Pattern p = Pattern.compile("<option value=\"(.+?)\">(.+?)</option>");
-		Matcher m = p.matcher(responseBody);
-		while (m.find()) {
-			Show show = new Show();
-			show.setId(Long.parseLong(StringUtils.trim(m.group(1))));
-			show.setName(StringUtils.trim(m.group(2)));
-			shows.add(show);
-		}
-		return shows;
-	}
+    private final String cookie;
 
-	/**
-	 * Returns all episodes for provided show ID
-	 * 
-	 * @param showId
-	 *            show ID
-	 * @return all episodes for given show ID
-	 * @throws ClientProtocolException
-	 * @throws IOException
-	 * @throws ParseException
-	 */
-	public List<Episode> getAllEpisodesForShow(Long showId) throws ClientProtocolException, IOException, ParseException {
-		HttpGet httpGet = new HttpGet(MY_EPISODES_URL + EPISODES_BY_SHOW_LOCATION + showId.toString());
-		httpGet.setHeader("Cookie", MY_EPISODES_COOKIE);
-		log.debug("Executing request: " + httpGet.getURI());
-		HttpResponse httpResponse = httpClient.execute(httpGet);
-		String responseBody = getResponseAsString(httpResponse);
-		httpGet.abort();
+    public MyEpisodesHTTPClient(String cookie) {
+        this.cookie = cookie;
+        httpClient = new DefaultHttpClient();
+    }
 
-		List<Episode> episodes = new ArrayList<Episode>();
-		// replace all new lines with spaces
-		responseBody = responseBody.replaceAll("\\s+", " ");
-		Pattern p = Pattern
-				.compile("<td class=\"date\"><a href=.*?>(.+?)</a></td> <td class=\"showname\">(.+?)</td> <td class=\"longnumber\">(.+?)</td> <td class=\"epname\"><a href.*?>(.+?)</a></td>");
-		Matcher m = p.matcher(responseBody);
-		DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd-MMM-yyyy");
-		while (m.find()) {
-			try {
-				String airDate = StringUtils.trim(m.group(1));
-				String showName = StringUtils.trim(m.group(2));
-				String seasonAndEpisode = StringUtils.trim(m.group(3));
-				Integer season = Integer
-						.parseInt(seasonAndEpisode.split("x")[0]);
-				Integer episodeNumber = Integer.parseInt(seasonAndEpisode
-						.split("x")[1]);
-				String episodeName = StringUtils.trim(m.group(4));
-				Show show = new Show();
-				show.setId(showId);
-				show.setName(showName);
-				Episode episode = new Episode();
-				episode.getEpisodeKey().setShow(show);
-				episode.getEpisodeKey().setSeasonNumber(season);
-				episode.getEpisodeKey().setEpisodeNumber(episodeNumber);
-				episode.setAirDate(dateTimeFormatter.parseLocalDate(airDate));
-				episode.setName(episodeName);
-				episodes.add(episode);
-			} catch (Exception e) {
-			}
-		}
-		return episodes;
-	}
+    /**
+     * Returns all my shows
+     * 
+     * @return all my shows
+     * @throws ClientProtocolException
+     * @throws IOException
+     */
+    public List<Show> getAllShows() throws ClientProtocolException, IOException {
+        HttpGet httpGet = new HttpGet(MY_EPISODES_URL + MANAGE_SHOWS_LOCATION);
+        httpGet.setHeader("Cookie", cookie);
+        log.debug("Executing request: " + httpGet.getURI());
+        HttpResponse httpResponse = httpClient.execute(httpGet);
+        String responseBody = getResponseAsString(httpResponse);
+        httpGet.abort();
 
-	/**
-	 * Logs in user with provided username and password and returns cookie
-	 * 
-	 * @param username
-	 *            username
-	 * @param password
-	 *            password
-	 * @return cookie
-	 * @throws ClientProtocolException
-	 * @throws IOException
-	 */
-	public String login(String username, String password) throws ClientProtocolException, IOException {
-		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
-		formParams.add(new BasicNameValuePair("username", username));
-		formParams.add(new BasicNameValuePair("password", password));
-		formParams.add(new BasicNameValuePair("action", "Login"));
+        List<Show> shows = new ArrayList<Show>();
+        Pattern p = Pattern.compile("<option value=\"(.+?)\">(.+?)</option>");
+        Matcher m = p.matcher(responseBody);
+        while (m.find()) {
+            Show show = new Show();
+            show.setId(Long.parseLong(StringUtils.trim(m.group(1))));
+            show.setName(StringUtils.trim(m.group(2)));
+            shows.add(show);
+        }
+        return shows;
+    }
 
-		HttpContext localContext = new BasicHttpContext();
-		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formParams, "UTF-8");
-		HttpPost httpPost = new HttpPost(MY_EPISODES_URL + LOGIN_LOCATION);
-		httpPost.setEntity(entity);
-		log.debug("Executing request: " + httpPost.getURI());
-		HttpResponse httpResponse = httpClient.execute(httpPost, localContext);
-		httpPost.abort();
+    /**
+     * Returns all episodes for provided show ID
+     * 
+     * @param showId
+     *            show ID
+     * @return all episodes for given show ID
+     * @throws ClientProtocolException
+     * @throws IOException
+     * @throws ParseException
+     */
+    public List<Episode> getAllEpisodesForShow(Long showId) throws ClientProtocolException, IOException, ParseException {
+        HttpGet httpGet = new HttpGet(MY_EPISODES_URL + EPISODES_BY_SHOW_LOCATION + showId.toString());
+        httpGet.setHeader("Cookie", cookie);
+        log.debug("Executing request: " + httpGet.getURI());
+        HttpResponse httpResponse = httpClient.execute(httpGet);
+        String responseBody = getResponseAsString(httpResponse);
+        httpGet.abort();
 
-		Header[] headers = httpResponse.getHeaders("Set-Cookie");
-		String cookie = "";
-		for (Header header : headers) {
-			cookie += header.getName() + "=" + header.getValue() + "; ";
-		}
-		return cookie;
-	}
+        List<Episode> episodes = new ArrayList<Episode>();
+        // replace all new lines with spaces
+        responseBody = responseBody.replaceAll("\\s+", " ");
+        Pattern p = Pattern
+                .compile("<td class=\"date\"><a href=.*?>(.+?)</a></td> <td class=\"showname\">(.+?)</td> <td class=\"longnumber\">(.+?)</td> <td class=\"epname\"><a href.*?>(.+?)</a></td>");
+        Matcher m = p.matcher(responseBody);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd-MMM-yyyy");
+        while (m.find()) {
+            try {
+                String airDate = StringUtils.trim(m.group(1));
+                String showName = StringUtils.trim(m.group(2));
+                String seasonAndEpisode = StringUtils.trim(m.group(3));
+                Integer season = Integer.parseInt(seasonAndEpisode.split("x")[0]);
+                Integer episodeNumber = Integer.parseInt(seasonAndEpisode.split("x")[1]);
+                String episodeName = StringUtils.trim(m.group(4));
+                Show show = new Show();
+                show.setId(showId);
+                show.setName(showName);
+                Episode episode = new Episode();
+                episode.getEpisodeKey().setShow(show);
+                episode.getEpisodeKey().setSeasonNumber(season);
+                episode.getEpisodeKey().setEpisodeNumber(episodeNumber);
+                episode.setAirDate(dateTimeFormatter.parseLocalDate(airDate));
+                episode.setName(episodeName);
+                episodes.add(episode);
+            } catch (Exception e) {
+            }
+        }
+        return episodes;
+    }
 
-	/**
-	 * When HttpClient instance is no longer needed, shut down the connection manager to ensure immediate deallocation of all system resources
-	 */
-	public void shutdown() {
-		httpClient.getConnectionManager().shutdown();
-	}
+    /**
+     * Logs in user with provided username and password and returns cookie
+     * 
+     * @param username
+     *            username
+     * @param password
+     *            password
+     * @return cookie
+     * @throws ClientProtocolException
+     * @throws IOException
+     */
+    public Map<String, String> login(String username, String password) throws ClientProtocolException, IOException {
+        List<NameValuePair> formParams = new ArrayList<NameValuePair>();
+        formParams.add(new BasicNameValuePair("username", username));
+        formParams.add(new BasicNameValuePair("password", password));
+        formParams.add(new BasicNameValuePair("action", "Login"));
 
-	private String getResponseAsString(HttpResponse httpResponse) throws ClientProtocolException, IOException {
-		ResponseHandler<String> responseHandler = new BasicResponseHandler();
-		return responseHandler.handleResponse(httpResponse);
-	}
+        HttpContext localContext = new BasicHttpContext();
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formParams, "UTF-8");
+        HttpPost httpPost = new HttpPost(MY_EPISODES_URL + LOGIN_LOCATION);
+        httpPost.setEntity(entity);
+        log.debug("Executing request: " + httpPost.getURI());
+        HttpResponse httpResponse = httpClient.execute(httpPost, localContext);
+        httpPost.abort();
+
+        Header[] headers = httpResponse.getHeaders(COOKIE_NAME);
+        Map<String, String> cookies = new HashMap<>();
+        for (Header header : headers) {
+            Pattern pattern = Pattern.compile("(PHPSESSLVID|PHPSESSID|PHPSESSUID|PHPSESSGID)=(\\w+);.+");
+            Matcher matcher = pattern.matcher(header.getValue());
+            if (matcher.matches()) {
+                cookies.put(matcher.group(1), matcher.group(2));
+            }
+        }
+        return cookies;
+    }
+
+    /**
+     * When HttpClient instance is no longer needed, shut down the connection manager to ensure immediate deallocation
+     * of all system resources
+     */
+    public void shutdown() {
+        httpClient.getConnectionManager().shutdown();
+    }
+
+    private String getResponseAsString(HttpResponse httpResponse) throws ClientProtocolException, IOException {
+        ResponseHandler<String> responseHandler = new BasicResponseHandler();
+        return responseHandler.handleResponse(httpResponse);
+    }
 }
