@@ -1,6 +1,4 @@
-*.project
 *.classpath
 *.settings
 target/
 target-eclipse/
-web-app/WEB-INF/
