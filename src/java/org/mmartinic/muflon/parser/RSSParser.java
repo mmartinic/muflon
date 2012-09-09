@@ -29,7 +29,7 @@ public class RSSParser implements Serializable {
 
     private static final String MY_EPISODES_RSS_LINK = "http://www.myepisodes.com/rss.php?feed=mylist&uid=%s&pwdmd5=%s";
 
-    private DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd-MMM-yyyy");
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd-MMM-yyyy");
 
     private final String myEpisodesUsername;
     private final String pwdmd5;
@@ -52,9 +52,13 @@ public class RSSParser implements Serializable {
             SyndFeed feed = input.build(new XmlReader(feedUrl));
 
             for (Object object : feed.getEntries()) {
-                episodes.add(parseEntry((SyndEntryImpl) object));
+                Episode episode = parseEntry((SyndEntryImpl) object);
+                if (episode != null) {
+                    episodes.add(episode);
+                }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             log.error(e, e);
         }
         return episodes;
@@ -69,7 +73,6 @@ public class RSSParser implements Serializable {
      * @throws ParseException
      */
     private Episode parseEntry(SyndEntryImpl syndEntryImpl) throws ParseException {
-        Episode episode = new Episode();
 
         String uri = syndEntryImpl.getUri();
         String[] items = uri.split("-");
@@ -77,17 +80,26 @@ public class RSSParser implements Serializable {
         String title = syndEntryImpl.getTitle();
         Pattern p = Pattern.compile("\\[(.+?)\\]\\[(.+?)\\]\\[(.+?)\\]\\[(.+?)\\]");
         Matcher m = p.matcher(title);
-        m.find();
+        boolean found = m.find();
 
-        Show show = new Show();
-        show.setId(Long.parseLong(items[0]));
-        show.setName(StringUtils.trim(m.group(1)));
-        episode.getEpisodeKey().setShow(show);
-        episode.getEpisodeKey().setSeasonNumber(Integer.parseInt(items[1]));
-        episode.getEpisodeKey().setEpisodeNumber(Integer.parseInt(items[2]));
-        episode.setName(StringUtils.trim(m.group(3)));
-        episode.setAirDate(dateTimeFormatter.parseLocalDate(StringUtils.trim(m.group(4))));
+        Episode episode;
+        if (found) {
+            episode = new Episode();
+            Show show = new Show();
+            show.setId(Long.parseLong(items[0]));
+            show.setName(StringUtils.trim(m.group(1)));
+            episode.getEpisodeKey().setShow(show);
+            episode.getEpisodeKey().setSeasonNumber(Integer.parseInt(items[1]));
+            episode.getEpisodeKey().setEpisodeNumber(Integer.parseInt(items[2]));
+            episode.setName(StringUtils.trim(m.group(3)));
+            episode.setAirDate(dateTimeFormatter.parseLocalDate(StringUtils.trim(m.group(4))));
 
+            return episode;
+        }
+        else {
+            episode = null;
+        }
         return episode;
+
     }
 }

@@ -105,7 +105,7 @@ log4j = {
            'org.hibernate',
            'net.sf.ehcache.hibernate'
 
-     debug 'grails.app', 'org.mmartinic.muflon'
+     info 'grails.app', 'org.mmartinic.muflon'
 }
 
 // Added by the Spring Security Core plugin:

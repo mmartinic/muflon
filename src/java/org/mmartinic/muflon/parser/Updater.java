@@ -32,21 +32,21 @@ public class Updater {
      */
     @SuppressWarnings("unchecked")
     public void partialUpdate(String myEpisodesUsername, String pwdmd5, String cookie) {
-        log.debug("Starting partialUpdate");
+        log.info("Starting partialUpdate");
         MyEpisodesHTTPClient myEpisodesHTTPClient = new MyEpisodesHTTPClient(cookie);
         try {
             List<Show> currentShows = myEpisodesHTTPClient.getAllShows();
             List<Show> dbShows = showService.getAllShows();
 
-            List<Show> newShows = (List<Show>) ListUtils.removeAll(currentShows, dbShows);
-            List<Show> removedShows = (List<Show>) ListUtils.removeAll(dbShows, currentShows);
+            List<Show> newShows = ListUtils.removeAll(currentShows, dbShows);
+            List<Show> removedShows = ListUtils.removeAll(dbShows, currentShows);
 
-            log.debug("partialUpdate - currentShows: count(" + currentShows.size() + ") :" + currentShows);
-            log.debug("partialUpdate - dbShows: count(" + dbShows.size() + ") :" + dbShows);
-            log.debug("partialUpdate - newShows: count(" + newShows.size() + ") :" + newShows);
-            log.debug("partialUpdate - removedShows: count(" + removedShows.size() + ") :" + removedShows);
+            log.info("partialUpdate - currentShows: count(" + currentShows.size() + ") :" + currentShows);
+            log.info("partialUpdate - dbShows: count(" + dbShows.size() + ") :" + dbShows);
+            log.info("partialUpdate - newShows: count(" + newShows.size() + ") :" + newShows);
+            log.info("partialUpdate - removedShows: count(" + removedShows.size() + ") :" + removedShows);
 
-            log.debug("Starting partialUpdate - remove shows");
+            log.info("Starting partialUpdate - remove shows");
             for (Show show : removedShows) {
                 // TODO set on delete cascade to delete all episodes for show
                 List<Episode> episodes = episodeService.getAllEpisodesForShow(show.getId());
@@ -55,7 +55,7 @@ public class Updater {
                 }
                 showService.deleteShow(show.getId());
             }
-            log.debug("Starting partialUpdate - add new shows");
+            log.info("Starting partialUpdate - add new shows");
             for (Show show : newShows) {
                 Long showId = showService.addShow(show);
                 List<Episode> episodesForShow = myEpisodesHTTPClient.getAllEpisodesForShow(showId);
@@ -65,11 +65,12 @@ public class Updater {
                 // pause for 5 seconds
                 try {
                     Thread.sleep(5000);
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e) {
                 }
             }
 
-            log.debug("Starting partialUpdate - rss update");
+            log.info("Starting partialUpdate - rss update");
             RSSParser rssParser = new RSSParser(myEpisodesUsername, pwdmd5);
             List<Episode> episodesFromRSSFeed = rssParser.getEpisodesFromRSSFeed();
             for (Episode episode : episodesFromRSSFeed) {
@@ -82,18 +83,21 @@ public class Updater {
                         dbEpisode.setName(episode.getName());
                         episodeService.updateEpisode(dbEpisode);
                     }
-                } else {
+                }
+                else {
                     // episode doesn't exist in DB - add it
                     episodeService.addEpisode(episode);
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             log.error(e, e);
-        } finally {
+        }
+        finally {
             // TODO check this
             myEpisodesHTTPClient.shutdown();
         }
-        log.debug("Exiting partialUpdate");
+        log.info("Exiting partialUpdate");
     }
 
     /**
@@ -102,7 +106,7 @@ public class Updater {
      * Current show list is retrieved from MyEpisodes and all shows and its episodes are added to DB
      */
     public void completeUpdate(String cookie) {
-        log.debug("Starting completeUpdate");
+        log.info("Starting completeUpdate");
         MyEpisodesHTTPClient myEpisodesHTTPClient = new MyEpisodesHTTPClient(cookie);
         try {
             List<Show> dbShows = showService.getAllShows();
@@ -125,20 +129,23 @@ public class Updater {
                 // pause for 5 seconds
                 try {
                     Thread.sleep(5000);
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e) {
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             log.error(e, e);
-        } finally {
+        }
+        finally {
             // TODO check this
             myEpisodesHTTPClient.shutdown();
         }
-        log.debug("Exiting completeUpdate");
+        log.info("Exiting completeUpdate");
     }
 
     public void addOnlyFromRSSFeed(String myEpisodesUsername, String pwdmd5) {
-        log.debug("Starting addOnlyFromRSSFeed");
+        log.info("Starting addOnlyFromRSSFeed");
         try {
             RSSParser rssParser = new RSSParser(myEpisodesUsername, pwdmd5);
             List<Episode> episodesFromRSSFeed = rssParser.getEpisodesFromRSSFeed();
@@ -151,19 +158,22 @@ public class Updater {
                 if (dbEpisode != null) {
                     // episode exists in DB
                     if (!dbEpisode.equals(episode)) {
-                        // episode data in DB is different from one in RSS feed - update it
+                        // episode data in DB is different from one in RSS feed
+                        // - update it
                         dbEpisode.setAirDate(episode.getAirDate());
                         dbEpisode.setName(episode.getName());
                         episodeService.updateEpisode(dbEpisode);
                     }
-                } else {
+                }
+                else {
                     // episode doesn't exist in DB - add it
                     episodeService.addEpisode(episode);
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             log.error(e, e);
         }
-        log.debug("Exiting addOnlyFromRSSFeed");
+        log.info("Exiting addOnlyFromRSSFeed");
     }
 }

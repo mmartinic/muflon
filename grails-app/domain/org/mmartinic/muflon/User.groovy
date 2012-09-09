@@ -1,6 +1,6 @@
 package org.mmartinic.muflon
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.StringUtils
 
 class User {
 
@@ -20,6 +20,9 @@ class User {
     static constraints = {
         username blank: false, unique: true
         password blank: false
+        myEpisodesUsername nullable:true
+        myEpisodesCookie nullable:true
+        myEpisodesPwdmd5 nullable:true
     }
 
     static mapping = { password column: '`password`' }
