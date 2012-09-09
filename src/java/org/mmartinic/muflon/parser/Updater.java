@@ -31,7 +31,7 @@ public class Updater {
      * Retrieves episodes from RSS feed and updates them in DB
      */
     @SuppressWarnings("unchecked")
-    public void partialUpdate(String myEpisodesUsername, String pwdmd5, String cookie) {
+    public synchronized void partialUpdate(String myEpisodesUsername, String pwdmd5, String cookie) {
         log.info("Starting partialUpdate");
         MyEpisodesHTTPClient myEpisodesHTTPClient = new MyEpisodesHTTPClient(cookie);
         try {
@@ -107,7 +107,7 @@ public class Updater {
      * All shows and its episodes are deleted from DB<br>
      * Current show list is retrieved from MyEpisodes and all shows and its episodes are added to DB
      */
-    public void completeUpdate(String cookie) {
+    public synchronized void completeUpdate(String cookie) {
         log.info("Starting completeUpdate");
         MyEpisodesHTTPClient myEpisodesHTTPClient = new MyEpisodesHTTPClient(cookie);
         try {
@@ -147,7 +147,7 @@ public class Updater {
         log.info("Exiting completeUpdate");
     }
 
-    public void addOnlyFromRSSFeed(String myEpisodesUsername, String pwdmd5) {
+    public synchronized void addOnlyFromRSSFeed(String myEpisodesUsername, String pwdmd5) {
         log.info("Starting addOnlyFromRSSFeed");
         try {
             RSSParser rssParser = new RSSParser(myEpisodesUsername, pwdmd5);
