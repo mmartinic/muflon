@@ -17,7 +17,8 @@ public class ShowService extends AbstractDaoService<Show, Long> implements IShow
     public List<Show> getAllShows() throws ShowServiceException {
         try {
             return findAll();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new ShowServiceException(e);
         }
     }
@@ -26,7 +27,8 @@ public class ShowService extends AbstractDaoService<Show, Long> implements IShow
     public Long getShowsCount() throws ShowServiceException {
         try {
             return getAllCount();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new ShowServiceException(e);
         }
     }
@@ -35,7 +37,8 @@ public class ShowService extends AbstractDaoService<Show, Long> implements IShow
     public Show getShow(Long showId) throws ShowServiceException {
         try {
             return findById(showId);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new ShowServiceException(e);
         }
     }
@@ -44,7 +47,8 @@ public class ShowService extends AbstractDaoService<Show, Long> implements IShow
     public Long addShow(Show show) throws ShowServiceException {
         try {
             return create(show);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new ShowServiceException(e);
         }
     }
@@ -53,7 +57,8 @@ public class ShowService extends AbstractDaoService<Show, Long> implements IShow
     public void updateShow(Show show) throws ShowServiceException {
         try {
             update(show);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new ShowServiceException(e);
         }
     }
@@ -62,7 +67,8 @@ public class ShowService extends AbstractDaoService<Show, Long> implements IShow
     public void deleteShow(Long showId) throws ShowServiceException {
         try {
             delete(getShow(showId));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new ShowServiceException(e);
         }
     }

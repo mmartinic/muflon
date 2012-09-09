@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.Query;
@@ -14,7 +15,7 @@ import org.hibernate.criterion.Restrictions;
 
 public abstract class AbstractDaoService<T, PK extends Serializable> extends AbstractTransactionalService implements IGenericDao<T, PK> {
 
-    private Class<T> persistentClass;
+    private final Class<T> persistentClass;
 
     @SuppressWarnings("unchecked")
     public AbstractDaoService() {
@@ -121,9 +122,11 @@ public abstract class AbstractDaoService<T, PK extends Serializable> extends Abs
                 Object value = entry.getValue();
                 if (value instanceof Collection) {
                     query.setParameterList(entry.getKey(), (Collection<?>) value);
-                } else if (value instanceof Object[]) {
+                }
+                else if (value instanceof Object[]) {
                     query.setParameterList(entry.getKey(), (Object[]) value);
-                } else {
+                }
+                else {
                     query.setParameter(entry.getKey(), value);
                 }
             }
@@ -145,9 +148,11 @@ public abstract class AbstractDaoService<T, PK extends Serializable> extends Abs
                 Object value = entry.getValue();
                 if (value instanceof Collection) {
                     query.setParameterList(entry.getKey(), (Collection<?>) value);
-                } else if (value instanceof Object[]) {
+                }
+                else if (value instanceof Object[]) {
                     query.setParameterList(entry.getKey(), (Object[]) value);
-                } else {
+                }
+                else {
                     query.setParameter(entry.getKey(), value);
                 }
             }
@@ -168,9 +173,11 @@ public abstract class AbstractDaoService<T, PK extends Serializable> extends Abs
                 Object value = entry.getValue();
                 if (value instanceof Collection) {
                     query.setParameterList(entry.getKey(), (Collection<?>) value);
-                } else if (value instanceof Object[]) {
+                }
+                else if (value instanceof Object[]) {
                     query.setParameterList(entry.getKey(), (Object[]) value);
-                } else {
+                }
+                else {
                     query.setParameter(entry.getKey(), value);
                 }
             }
@@ -178,4 +185,8 @@ public abstract class AbstractDaoService<T, PK extends Serializable> extends Abs
         return query.executeUpdate();
     }
 
+    @Override
+    public void flush() {
+        getSession().flush();
+    }
 }

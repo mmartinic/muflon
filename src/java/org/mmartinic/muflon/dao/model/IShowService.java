@@ -17,4 +17,6 @@ public interface IShowService {
     void updateShow(Show show) throws ShowServiceException;
 
     void deleteShow(Long showId) throws ShowServiceException;
+
+    void flush();
 }

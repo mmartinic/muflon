@@ -55,6 +55,8 @@ public class Updater {
                 }
                 showService.deleteShow(show.getId());
             }
+            showService.flush();
+
             log.info("Starting partialUpdate - add new shows");
             for (Show show : newShows) {
                 Long showId = showService.addShow(show);
@@ -62,9 +64,9 @@ public class Updater {
                 for (Episode newEpisode : episodesForShow) {
                     episodeService.addEpisode(newEpisode);
                 }
-                // pause for 5 seconds
+                // pause for 1 second
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(1000);
                 }
                 catch (InterruptedException e) {
                 }
@@ -118,6 +120,7 @@ public class Updater {
                 }
                 showService.deleteShow(show.getId());
             }
+            showService.flush();
 
             List<Show> currentShows = myEpisodesHTTPClient.getAllShows();
             for (Show show : currentShows) {
@@ -126,9 +129,9 @@ public class Updater {
                 for (Episode newEpisode : episodesForShow) {
                     episodeService.addEpisode(newEpisode);
                 }
-                // pause for 5 seconds
+                // pause for 1 second
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(1000);
                 }
                 catch (InterruptedException e) {
                 }
@@ -158,8 +161,7 @@ public class Updater {
                 if (dbEpisode != null) {
                     // episode exists in DB
                     if (!dbEpisode.equals(episode)) {
-                        // episode data in DB is different from one in RSS feed
-                        // - update it
+                        // episode data in DB is different from one in RSS feed - update it
                         dbEpisode.setAirDate(episode.getAirDate());
                         dbEpisode.setName(episode.getName());
                         episodeService.updateEpisode(dbEpisode);

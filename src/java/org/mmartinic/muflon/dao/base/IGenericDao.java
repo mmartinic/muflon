@@ -3,6 +3,7 @@ package org.mmartinic.muflon.dao.base;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+
 import org.hibernate.Criteria;
 
 public interface IGenericDao<T, PK extends Serializable> {
@@ -43,4 +44,5 @@ public interface IGenericDao<T, PK extends Serializable> {
 
     int updateByQuery(String hql, Map<String, Object> parameters);
 
+    void flush();
 }

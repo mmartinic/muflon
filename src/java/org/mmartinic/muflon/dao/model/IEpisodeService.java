@@ -23,4 +23,6 @@ public interface IEpisodeService {
 
     void deleteEpisode(EpisodeKey episodeKey) throws EpisodeServiceException;
 
+    void flush();
+
 }
