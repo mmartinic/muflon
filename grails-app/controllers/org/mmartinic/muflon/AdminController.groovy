@@ -2,7 +2,7 @@ package org.mmartinic.muflon
 
 import grails.plugins.springsecurity.Secured
 
-import org.mmartinic.muflon.parser.MyEpisodesHTTPClient;
+import org.mmartinic.muflon.parser.MyEpisodesHTTPClient
 import org.mmartinic.muflon.parser.Updater
 
 @Secured([Role.ADMIN])
@@ -12,6 +12,14 @@ class AdminController {
     def springSecurityService
 
     def index() {
+        if (flash.message == null) {
+            if (springSecurityService.currentUser.isLoggedInToMyEpisodes()) {
+                flash.message = message(code: "myepisodes.found.login", default:"Logged in to My episodes")
+            }
+            else {
+                flash.message = message(code: "myepisodes.no.login", default:"Please login to My episodes")
+            }
+        }
     }
 
     def rssUpdate() {
@@ -21,7 +29,7 @@ class AdminController {
             flash.message = message(code: "myepisodes.update.rss.finished", default:"Rss update finished")
         }
         else {
-            flash.message = message(code: "myepisodes.no.login.", default:"Please login to My episodes")
+            flash.message = message(code: "myepisodes.no.login", default:"Please login to My episodes")
         }
         redirect(action: "index")
     }
@@ -33,7 +41,7 @@ class AdminController {
             flash.message = message(code: "myepisodes.update.partial.finished", default:"Partial update finished")
         }
         else {
-            flash.message = message(code: "myepisodes.no.login.", default:"Please login to My episodes")
+            flash.message = message(code: "myepisodes.no.login", default:"Please login to My episodes")
         }
         redirect(action: "index")
     }
@@ -45,7 +53,7 @@ class AdminController {
             flash.message = message(code: "myepisodes.update.complete.finished", default:"Complete update finished")
         }
         else {
-            flash.message = message(code: "myepisodes.no.login.", default:"Please login to My episodes")
+            flash.message = message(code: "myepisodes.no.login", default:"Please login to My episodes")
         }
         redirect(action: "index")
     }
