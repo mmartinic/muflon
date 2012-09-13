@@ -1,12 +1,10 @@
 package org.mmartinic.muflon
 
 import grails.converters.JSON
-import grails.plugins.springsecurity.Secured
 
 import org.joda.time.LocalDate
 import org.mmartinic.muflon.model.Episode
 
-@Secured([Role.USER, Role.ADMIN])
 class EpisodeController {
 
     def index() {
@@ -29,7 +27,6 @@ class EpisodeController {
             def date2 = today + 20
             episodeInstanceList = Episode.findAllByAirDateBetween (date1, date2, [sort:"airDate", order:"asc"])
         }
-        log.info episodeInstanceList.size()
         withFormat{
             html{ return [episodeInstanceList: episodeInstanceList] }
             json{ render episodeInstanceList as JSON }
