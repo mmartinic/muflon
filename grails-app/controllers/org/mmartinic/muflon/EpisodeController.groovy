@@ -15,17 +15,40 @@ class EpisodeController {
         def episodeInstanceList
         def range = params.range
         if (range == "all") {
-            episodeInstanceList = Episode.list(sort:"airDate", order:"asc")
+            episodeInstanceList = Episode.withCriteria {
+                and {
+                    order("airDate", "asc")
+                    order("episodeKey.show.id", "asc")
+                    order("episodeKey.seasonNumber", "asc")
+                    order("episodeKey.episodeNumber", "asc")
+                }
+            }
         }
         else if (range == "today") {
             def today = LocalDate.now()
-            episodeInstanceList = Episode.findAllByAirDate(today, [sort:"airDate", order:"asc"])
+            episodeInstanceList = Episode.withCriteria {
+                and {
+                    eq("airDate", today)
+                    order("airDate", "asc")
+                    order("episodeKey.show.id", "asc")
+                    order("episodeKey.seasonNumber", "asc")
+                    order("episodeKey.episodeNumber", "asc")
+                }
+            }
         }
         else {
             def today = LocalDate.now()
             def date1 = today - 20
             def date2 = today + 20
-            episodeInstanceList = Episode.findAllByAirDateBetween (date1, date2, [sort:"airDate", order:"asc"])
+            episodeInstanceList = Episode.withCriteria {
+                and {
+                    between("airDate", date1, date2)
+                    order("airDate", "asc")
+                    order("episodeKey.show.id", "asc")
+                    order("episodeKey.seasonNumber", "asc")
+                    order("episodeKey.episodeNumber", "asc")
+                }
+            }
         }
         withFormat{
             html{ return [episodeInstanceList: episodeInstanceList] }
