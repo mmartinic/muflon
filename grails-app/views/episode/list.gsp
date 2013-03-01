@@ -47,6 +47,7 @@
                         <td>
                             <div>
                                 <g:isohuntLink episode="${episodeInstance}" />
+                                <g:piratebayLink episode="${episodeInstance}" />
                                 <g:addic7edLink episode="${episodeInstance}" />
                             </div>
                         </td>

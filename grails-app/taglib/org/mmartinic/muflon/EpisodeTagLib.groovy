@@ -32,4 +32,16 @@ class EpisodeTagLib {
         out << String.format("%02d", episode.episodeNumber)
         out << """&Submit=Search'><img src="${resource(dir:'images',file:'addic7ed.ico')}">Addic7ed</a>"""
     }
+
+    def piratebayLink = {attrs ->
+        Episode episode = attrs.episode
+        out << "<a href='http://thepiratebay.se/search/"
+        out << episode.show.name.encodeAsURL()
+        out << " ".encodeAsURL()
+        out << "S"
+        out << String.format("%02d", episode.seasonNumber)
+        out << "E"
+        out << String.format("%02d", episode.episodeNumber)
+        out << """/0/7/0'><img src="${resource(dir:'images',file:'piratebay.ico')}">Piratebay</a>"""
+    }
 }
