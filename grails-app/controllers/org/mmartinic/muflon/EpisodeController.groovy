@@ -4,7 +4,9 @@ import grails.converters.JSON
 
 import org.joda.time.LocalDate
 import org.mmartinic.muflon.model.Episode
+import org.springframework.security.access.annotation.Secured
 
+@Secured('permitAll')
 class EpisodeController {
 
     def index() {

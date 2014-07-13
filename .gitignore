@@ -2,3 +2,6 @@
 *.settings
 target/
 target-eclipse/
+/.idea
+*.iml
+/build

@@ -7,37 +7,28 @@ dataSource {
 hibernate {
     cache.use_second_level_cache = true
     cache.use_query_cache = true
-    cache.region.factory_class = "net.sf.ehcache.hibernate.EhCacheRegionFactory"
+    cache.provider_class = "net.sf.ehcache.hibernate.EhCacheProvider"
 }
+
 // environment specific settings
 environments {
     development {
-        dataSource {
-            dbCreate = "update" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:mysql://localhost:3306/muflon"
-        }
-    }
-    test {
-        dataSource {
-            dbCreate = "update"
-            url = "jdbc:mysql://localhost:3306/muflon"
-        }
-    }
-    production {
-        dataSource {
-            dbCreate = "update"
-            url = "jdbc:mysql://localhost:3306/muflon"
-            pooled = true
-            properties {
-                maxActive = -1
-                minEvictableIdleTimeMillis=1800000
-                timeBetweenEvictionRunsMillis=1800000
-                numTestsPerEvictionRun=3
-                testOnBorrow=true
-                testWhileIdle=true
-                testOnReturn=true
-                validationQuery="SELECT 1"
-            }
-        }
-    }
+		    dataSource {
+                  driverClassName = "org.h2.Driver"
+			      dbCreate = "create" // one of 'create', 'create-drop','update'
+                  url = "jdbc:h2:mem:devDb"
+		    }
+	  }
+	  test {
+		    dataSource {
+			      dbCreate = "update"
+			      url = "jdbc:mysql://localhost:3306/muflon"
+		    }
+	  }
+	  production {
+		    dataSource {
+			      dbCreate = "update"
+			      url = "jdbc:mysql://localhost:3306/muflon"
+		    }
+	  }
 }

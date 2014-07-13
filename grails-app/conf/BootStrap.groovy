@@ -1,11 +1,9 @@
-import grails.util.GrailsUtil
+import grails.util.Environment
 
 import org.mmartinic.muflon.Role
 import org.mmartinic.muflon.User
 import org.mmartinic.muflon.UserRole
 import org.mmartinic.muflon.util.MetaClassInjector
-
-
 
 class BootStrap {
 
@@ -21,7 +19,7 @@ class BootStrap {
         assert User.count() == 1
         assert UserRole.count() == 1
 
-        switch(GrailsUtil.environment) {
+        switch(Environment.getCurrent()) {
             case "development":
                 break
             case "production" :

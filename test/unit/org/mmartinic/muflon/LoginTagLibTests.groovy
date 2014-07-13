@@ -2,7 +2,7 @@ package org.mmartinic.muflon
 
 import static org.junit.Assert.*
 
-import grails.plugins.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.SpringSecurityService
 import grails.test.mixin.*
 import grails.test.mixin.support.*
 import groovy.mock.interceptor.StubFor

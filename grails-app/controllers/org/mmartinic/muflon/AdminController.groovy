@@ -1,6 +1,6 @@
 package org.mmartinic.muflon
 
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.annotation.Secured
 
 import org.mmartinic.muflon.parser.MyEpisodesHTTPClient
 import org.mmartinic.muflon.parser.Updater
